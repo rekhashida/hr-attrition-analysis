@@ -48,6 +48,7 @@ Logistic Regression, Random Forest, and XGBoost trained to predict attrition, wi
 **Top predictors** (Logistic Regression coefficients): OverTime, Job Role (Sales Representative, Laboratory Technician), frequent business travel, total working years, job level, and marital status — largely confirming the EDA findings while surfacing two new drivers (business travel frequency, marital status) not identified in the initial EDA.
 
 ## 📁 Files
+- `IBM_HR.ipynb` — Colab notebook (EDA, risk-flag logic, SQL, ML model)
 - `WA_Fn-UseC_-HR-Employee-Attrition.csv` — raw dataset
 - `hr_attrition_clean.csv` — cleaned dataset with engineered RiskCategory
 - `hr_attrition_with_ml_risk.csv` — dataset with model-predicted risk probabilities and tiers
