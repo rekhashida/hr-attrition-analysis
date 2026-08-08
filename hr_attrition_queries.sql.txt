@@ -1,0 +1,66 @@
+##SQL QUeries
+import sqlite3
+
+conn = sqlite3.connect(':memory:')
+df.to_sql('hr_attrition', conn, index=False, if_exists='replace')
+
+queries = {
+"1. Attrition rate by department": """
+    SELECT Department, 
+           ROUND(AVG(AttritionFlag)*100, 2) AS attrition_rate_pct,
+           COUNT(*) AS headcount
+    FROM hr_attrition GROUP BY Department ORDER BY attrition_rate_pct DESC;
+""",
+
+"2. Avg income: high risk vs low risk": """
+    SELECT RiskCategory, ROUND(AVG(MonthlyIncome),0) AS avg_income, COUNT(*) AS headcount
+    FROM hr_attrition GROUP BY RiskCategory;
+""",
+
+"3. Headcount by risk category and job role": """
+    SELECT JobRole, RiskCategory, COUNT(*) AS headcount
+    FROM hr_attrition GROUP BY JobRole, RiskCategory ORDER BY JobRole;
+""",
+
+"4. Overtime distribution within high-risk group": """
+    SELECT OverTime, COUNT(*) AS headcount
+    FROM hr_attrition WHERE RiskCategory='High Risk' GROUP BY OverTime;
+""",
+
+"5. Top 5 roles by high-risk %": """
+    SELECT JobRole,
+           ROUND(100.0*SUM(CASE WHEN RiskCategory='High Risk' THEN 1 ELSE 0 END)/COUNT(*), 2) AS high_risk_pct,
+           COUNT(*) AS headcount
+    FROM hr_attrition GROUP BY JobRole ORDER BY high_risk_pct DESC LIMIT 5;
+""",
+
+"6. Avg tenure: leavers vs stayers": """
+    SELECT Attrition, ROUND(AVG(YearsAtCompany),1) AS avg_tenure
+    FROM hr_attrition GROUP BY Attrition;
+""",
+
+"7. Attrition rate by job satisfaction level": """
+    SELECT JobSatisfaction, ROUND(AVG(AttritionFlag)*100,2) AS attrition_rate_pct
+    FROM hr_attrition GROUP BY JobSatisfaction ORDER BY JobSatisfaction;
+""",
+
+"8. Avg distance from home: high risk vs low risk": """
+    SELECT RiskCategory, ROUND(AVG(DistanceFromHome),1) AS avg_distance_km
+    FROM hr_attrition GROUP BY RiskCategory;
+""",
+
+"9. Gender breakdown of high-risk employees": """
+    SELECT Gender, COUNT(*) AS headcount
+    FROM hr_attrition WHERE RiskCategory='High Risk' GROUP BY Gender;
+""",
+
+"10. Department x risk category matrix": """
+    SELECT Department, RiskCategory, COUNT(*) AS headcount,
+           ROUND(100.0*COUNT(*)/SUM(COUNT(*)) OVER (PARTITION BY Department), 1) AS pct_within_dept
+    FROM hr_attrition GROUP BY Department, RiskCategory ORDER BY Department;
+"""
+}
+
+for title, q in queries.items():
+    print(f"\n{'='*60}\n{title}\n{'='*60}")
+    print(pd.read_sql_query(q, conn))
